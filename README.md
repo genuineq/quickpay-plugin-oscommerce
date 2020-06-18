@@ -22,8 +22,8 @@ Changelog
 1.0.2 
 - Indented all code to ease future development.
 - Fixed not defined variable warnings:
-* Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ZONE
-* Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ADVANCED_APIKEY
+  * Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ZONE
+  * Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ADVANCED_APIKEY
 - Added all quickpay payment options logos.
 -Added translations for missing payment options.
 1.0.1 
