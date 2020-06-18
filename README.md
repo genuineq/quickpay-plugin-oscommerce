@@ -1,4 +1,4 @@
-# quickpay-osc-module
+# quickpay-oscommerce-module
 Quickpay payment module for osCommerce
 Modular package.
 
