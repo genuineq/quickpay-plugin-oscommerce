@@ -1,0 +1,1 @@
+# quickpay-plugin-oscommerce
