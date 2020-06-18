@@ -25,7 +25,8 @@ Changelog
   * Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ZONE
   * Warning: Use of undefined constant MODULE_PAYMENT_QUICKPAY_ADVANCED_APIKEY
 - Added all quickpay payment options logos.
--Added translations for missing payment options.
+- Added translations for missing payment options.
 1.0.1 
- - Two files updated for minor compatibility issues. Symptoms: on databases set up by a previous addon version, all orders were treated as if quickpay leading to Warning: array_reverse expects parameter 1 to be an array
-	  link in confirmation email sent customer to FILENAME_ACCOUNT_HISTORY_INFO
+- Two files updated for minor compatibility issues. Symptoms:
+   * on databases set up by a previous addon version, all orders were treated as if quickpay leading to Warning: array_reverse expects parameter 1 to be an array
+  * link in confirmation email sent customer to FILENAME_ACCOUNT_HISTORY_INFO
