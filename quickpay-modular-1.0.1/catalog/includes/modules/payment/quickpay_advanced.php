@@ -554,36 +554,36 @@ class quickpay_advanced {
 
         $error_msg = CONDITION_AGREEMENT_ERROR;
         $onload = <<<EOT
-        <script type="text/javascript">
-            $(document).ready(function() {
+<script type="text/javascript">
+    $(document).ready(function() {
 
-                $('#agreed').click(function(){
-                    if($(this).val() == 'true'){
-                        $(this).val('false');
-                    } else {
-                        $(this).val('true');
-                    }
-                });
+        $('#agreed').click(function(){
+            if($(this).val() == 'true'){
+                $(this).val('false');
+            } else {
+                $(this).val('true');
+            }
+        });
 
-                $( "form[name='checkout_confirmation']" ).submit(function( e ) {
-                    if($('#agreed').val() == 'true'){
-                        return true;
-                    } else {
-                        e.preventDefault();
-                        alert('$error_msg');
-                        return false;
-                    }
-                });
+        $( "form[name='checkout_confirmation']" ).submit(function( e ) {
+            if($('#agreed').val() == 'true'){
+                return true;
+            } else {
+                e.preventDefault();
+                alert('$error_msg');
+                return false;
+            }
+        });
 
-                // for BS version - make parent box full width
-                var ppDiv = $( "#agree_terms" ).parent().parent();
-                if (ppDiv.hasClass('col-sm-6')) {
-                    ppDiv.removeClass('col-sm-6');
-                    ppDiv.addClass('col-sm-12');
-                }
-            });
-        </script>
-        EOT;
+        // for BS version - make parent box full width
+        var ppDiv = $( "#agree_terms" ).parent().parent();
+        if (ppDiv.hasClass('col-sm-6')) {
+            ppDiv.removeClass('col-sm-6');
+            ppDiv.addClass('col-sm-12');
+        }
+    });
+</script>
+EOT;
         $oscTemplate->addBlock($onload, 'footer_scripts');
 
         $agree_terms = '
