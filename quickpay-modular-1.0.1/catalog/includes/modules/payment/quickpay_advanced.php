@@ -142,165 +142,96 @@ class quickpay_advanced {
     function selection() {
         global $order, $currencies, $qp_card, $cardlock;
         $qty_groups = 0;
-        // $fees =array();
 
+        /** You can extend the following cards-array and upload corresponding titled images to images/icons */
+        $module_available_cards = [
+            '3d-dankort',
+            '3d-jcb',
+            '3d-visa',
+            '3d-mastercard',
+            'mastercard',
+            'mastercard-debet',
+            'american-express',
+            'dankort',
+            'diners',
+            'jcb',
+            'visa',
+            'visa-electron',
+            'viabill',
+            'fbg1886',
+            'paypal',
+            'sofort',
+            'mobilepay',
+            'bitcoin',
+            'swish',
+            'trustly',
+            'klarna',
+            'maestro',
+            'ideal',
+            'paysafecard',
+            'resurs',
+            'vipps',
+        ];
+
+        /** Count how many MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP are configured. */
         for ($i = 1; $i <= $this->num_groups; $i++) {
             if (constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) == '') {
                 continue;
             }
-            // if (constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i. '_FEE') == '') {
-                // continue;
-            // }else{
-                // $fees[$i] = constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_FEE');
-            // }
+
             $qty_groups++;
         }
 
-        if($qty_groups>1) {
+        if($qty_groups > 1) {
             $selection = array('id' => $this->code, 'module' => $this->title. tep_draw_hidden_field('cardlock', $cardlock ));
-            // $selection['module'] .= tep_draw_hidden_field('qp_card', (isset($fees[1])) ? $fees[1] : '0');
-        }
 
-        $selection['fields'] = array();
-        $msg = '';
-        $optscount=0;
-        for ($i = 1; $i <= $this->num_groups; $i++) {
-            $options_text = '';
-            if (defined('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) && constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) != '') {
-                $payment_options = preg_split('[\,\;]', constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i));
-                foreach ($payment_options as $option) {
-                    $cost = (MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE == "No" || $option == 'viabill' ? "0" : "1");
-                    if($option=="creditcard"){
-                        $optscount++;
-                        //You can extend the following cards-array and upload corresponding titled images to images/icons
-                        $cards= array(
-                            '3d-dankort',
-                            '3d-jcb',
-                            '3d-visa',
-                            '3d-mastercard',
-                            'mastercard',
-                            'mastercard-debet',
-                            'american-express',
-                            'dankort',
-                            'diners',
-                            'jcb',
-                            'visa',
-                            'visa-electron',
-                            'viabill',
-                            'fbg1886',
-                            'paypal',
-                            'sofort',
-                            'mobilepay',
-                            'bitcoin',
-                            'swish',
-                            'trustly',
-                            'klarna',
-                            'maestro',
-                            'ideal',
-                            'paysafecard',
-                            'resurs',
-                            'vipps',
-                        );
-
-
-                        foreach ($cards as $optionc) {
-                            $iconc ="";
-                            $iconc = (file_exists(DIR_WS_ICONS.$optionc.".png") ? DIR_WS_ICONS.$optionc.".png": $iconc);
-                            $iconc = (file_exists(DIR_WS_ICONS.$optionc.".jpg") ? DIR_WS_ICONS.$optionc.".jpg": $iconc);
-                            $iconc = (file_exists(DIR_WS_ICONS.$optionc.".gif") ? DIR_WS_ICONS.$optionc.".gif": $iconc);
-                            //define payment icon width
-                            $w= 35;
-                            $h= 22;
-                            $space = 5;
-
-                            $msg .= tep_image($iconc,$optionc,$w,$h,'style="position:relative;border:0px;float:left;margin:'.$space.'px;" ');
-
-
-                        }
-                        $options_text=$msg;
-
-                        // $cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
-
-                        if($qty_groups==1){
-                            $selection = array(
-                                'id' => $this->code,
-                                'module' => '<table width="100%" border="0">
-                                                <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
-                                                    <td class="main" style="height:22px;vertical-align:middle;">' .$options_text.($cost !=0 ? '</td><td class="main" style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
-                                                        </td>
-                                                </tr>'.'
-                                            </table>'.tep_draw_hidden_field('cardlock', $option));
-
-
-                        }else{
-                            $selection['fields'][] = array(
-                                'title' => '<table width="100%" border="0">
-                                                <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
-                                                    <td class="main" style="height:22px;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;">(+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
-                                                        </td>
-                                                </tr>'.'
-                                            </table>',
-                                'field' => tep_draw_radio_field(
-                                    'qp_card',
-                                    '',
-                                    ($option==$cardlock ? true : false),
-                                    ' onClick="setQuickPay(); document.checkout_payment.cardlock.value = \''.$option.'\';" '
-                                )
-                            );
-                        }//end qty=1
-                    }
-
-                    if($option != "creditcard"){
-                        //upload images to images/icons corresponding to your chosen cardlock groups in your payment module settings
-                        //OPTIONAL image if different from cardlogo, add _payment to filename
-
-                        $selectedopts = explode(",", $option);
-                        $icon = "";
-                        foreach($selectedopts as $option){
+            /** Parse all the configured MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP */
+            $selection['fields'] = array();
+            $msg = '';
+            $optscount=0;
+            for ($i = 1; $i <= $this->num_groups; $i++) {
+                $options_text = '';
+                if (defined('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) && constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) != '') {
+                    $payment_options = preg_split('[\,\;]', constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i));
+                    foreach ($payment_options as $option) {
+                        $cost = (MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE == "No" || $option == 'viabill' ? "0" : "1");
+                        if($option=="creditcard"){
                             $optscount++;
 
-                            $icon = (file_exists(DIR_WS_ICONS . $option . ".png") ? DIR_WS_ICONS . $option . ".png" : $icon);
-                            $icon = (file_exists(DIR_WS_ICONS . $option . ".jpg") ? DIR_WS_ICONS . $option . ".jpg" : $icon);
-                            $icon = (file_exists(DIR_WS_ICONS . $option . ".gif") ? DIR_WS_ICONS . $option . ".gif" : $icon);
-                            $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.png") ? DIR_WS_ICONS . $option . "_payment.png" : $icon);
-                            $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.jpg") ? DIR_WS_ICONS . $option . "_payment.jpg" : $icon);
-                            $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.gif") ? DIR_WS_ICONS . $option . "_payment.gif" : $icon);
-                            $space = 5;
+                            foreach ($module_available_cards as $optionc) {
+                                $iconc ="";
+                                $iconc = (file_exists(DIR_WS_ICONS.$optionc.".png") ? DIR_WS_ICONS.$optionc.".png": $iconc);
+                                $iconc = (file_exists(DIR_WS_ICONS.$optionc.".jpg") ? DIR_WS_ICONS.$optionc.".jpg": $iconc);
+                                $iconc = (file_exists(DIR_WS_ICONS.$optionc.".gif") ? DIR_WS_ICONS.$optionc.".gif": $iconc);
+                                //define payment icon width
+                                $w= 35;
+                                $h= 22;
+                                $space = 5;
 
-                            //define payment icon width
-                            if(strstr($icon, "_payment")){
-                                $w = 120;
-                                $h = 27;
-                                if(strstr($icon, "3d")){
-                                    $w = 60;
-                                }
-                            }else{
-                                $w = 35;
-                                $h = 22;
+                                $msg .= tep_image($iconc,$optionc,$w,$h,'style="position:relative;border:0px;float:left;margin:'.$space.'px;" ');
+
+
                             }
+                            $options_text=$msg;
 
-                            //$cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
-                            $options_text = '<table width="100%">
-                                                <tr>
-                                                    <td>'.tep_image($icon,$this->get_payment_options_name($option),$w,$h,' style="position:relative;border:0px;float:left;margin:'.$space.'px;" ').'</td>
-                                                    <td style="height: 27px;white-space:nowrap;vertical-align:middle;" >' . $this->get_payment_options_name($option) . '</td>
-                                                </tr>
-                                            </table>';
+                            // $cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
 
                             if($qty_groups==1){
                                 $selection = array(
                                     'id' => $this->code,
                                     'module' => '<table width="100%" border="0">
                                                     <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
-                                                        <td class="main" style="height: 27px;white-space:nowrap;vertical-align:middle;">' .$options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                        <td class="main" style="height:22px;vertical-align:middle;">' .$options_text.($cost !=0 ? '</td><td class="main" style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
                                                             </td>
                                                     </tr>'.'
-                                                </table>'.tep_draw_hidden_field('cardlock', $option).tep_draw_hidden_field('qp_card', (isset($fees[1])) ? $fees[1] : '0'));
+                                                </table>'.tep_draw_hidden_field('cardlock', $option));
+
+
                             }else{
                                 $selection['fields'][] = array(
                                     'title' => '<table width="100%" border="0">
                                                     <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
-                                                        <td class="main" style="height: 27px;white-space:nowrap;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                        <td class="main" style="height:22px;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;">(+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
                                                             </td>
                                                     </tr>'.'
                                                 </table>',
@@ -308,15 +239,213 @@ class quickpay_advanced {
                                         'qp_card',
                                         '',
                                         ($option==$cardlock ? true : false),
-                                        ' onClick="setQuickPay();document.checkout_payment.cardlock.value = \''.$option.'\';" '
+                                        ' onClick="setQuickPay(); document.checkout_payment.cardlock.value = \''.$option.'\';" '
                                     )
                                 );
-                            }//end qty
+                            }//end qty=1
+                        }
+
+                        if($option != "creditcard"){
+                            //upload images to images/icons corresponding to your chosen cardlock groups in your payment module settings
+                            //OPTIONAL image if different from cardlogo, add _payment to filename
+
+                            $selectedopts = explode(",", $option);
+                            $icon = "";
+                            foreach($selectedopts as $option){
+                                $optscount++;
+
+                                $icon = (file_exists(DIR_WS_ICONS . $option . ".png") ? DIR_WS_ICONS . $option . ".png" : $icon);
+                                $icon = (file_exists(DIR_WS_ICONS . $option . ".jpg") ? DIR_WS_ICONS . $option . ".jpg" : $icon);
+                                $icon = (file_exists(DIR_WS_ICONS . $option . ".gif") ? DIR_WS_ICONS . $option . ".gif" : $icon);
+                                $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.png") ? DIR_WS_ICONS . $option . "_payment.png" : $icon);
+                                $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.jpg") ? DIR_WS_ICONS . $option . "_payment.jpg" : $icon);
+                                $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.gif") ? DIR_WS_ICONS . $option . "_payment.gif" : $icon);
+                                $space = 5;
+
+                                //define payment icon width
+                                if(strstr($icon, "_payment")){
+                                    $w = 120;
+                                    $h = 27;
+                                    if(strstr($icon, "3d")){
+                                        $w = 60;
+                                    }
+                                }else{
+                                    $w = 35;
+                                    $h = 22;
+                                }
+
+                                //$cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
+                                $options_text = '<table width="100%">
+                                                    <tr>
+                                                        <td>'.tep_image($icon,$this->get_payment_options_name($option),$w,$h,' style="position:relative;border:0px;float:left;margin:'.$space.'px;" ').'</td>
+                                                        <td style="height: 27px;white-space:nowrap;vertical-align:middle;" >' . $this->get_payment_options_name($option) . '</td>
+                                                    </tr>
+                                                </table>';
+
+                                if($qty_groups==1){
+                                    $selection = array(
+                                        'id' => $this->code,
+                                        'module' => '<table width="100%" border="0">
+                                                        <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
+                                                            <td class="main" style="height: 27px;white-space:nowrap;vertical-align:middle;">' .$options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                                </td>
+                                                        </tr>'.'
+                                                    </table>'.tep_draw_hidden_field('cardlock', $option).tep_draw_hidden_field('qp_card', (isset($fees[1])) ? $fees[1] : '0'));
+                                }else{
+                                    $selection['fields'][] = array(
+                                        'title' => '<table width="100%" border="0">
+                                                        <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
+                                                            <td class="main" style="height: 27px;white-space:nowrap;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                                </td>
+                                                        </tr>'.'
+                                                    </table>',
+                                        'field' => tep_draw_radio_field(
+                                            'qp_card',
+                                            '',
+                                            ($option==$cardlock ? true : false),
+                                            ' onClick="setQuickPay();document.checkout_payment.cardlock.value = \''.$option.'\';" '
+                                        )
+                                    );
+                                }//end qty
+                            }
                         }
                     }
                 }
             }
+        } else {
+            /** No MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP have been configured. this means we display all the module payment available options. */
+            $selection = array('id' => $this->code, 'module' => $this->title . tep_draw_hidden_field('cardlock', $cardlock ));
+
+            /** Create an array with all module available options. */
+            $module_payment_options = [
+                'creditcard',
+                '3d-dankort',
+                '3d-jcb',
+                '3d-visa',
+                '3d-visa-dk',
+                '3d-visa-electron',
+                '3d-visa-electron-dk',
+                '3d-visa-debet',
+                '3d-visa-debet-dk',
+                '3d-maestro',
+                '3d-maestro-dk',
+                '3d-mastercard',
+                '3d-mastercard-dk',
+                '3d-mastercard-debet',
+                '3d-mastercard-debet-dk',
+                '3d-creditcard',
+                'mastercard',
+                'mastercard-dk',
+                'mastercard-debet',
+                'mastercard-debet-dk',
+                'american-express',
+                'american-express-dk',
+                'dankort',
+                'diners',
+                'diners-dk',
+                'jcb',
+                'visa',
+                'visa-dk',
+                'visa-electron',
+                'visa-electron-dk',
+                'viabill',
+                'fbg1886',
+                'paypal',
+                'sofort',
+                'mobilepay',
+                'bitcoin',
+                'swish',
+                'trustly',
+                'klarna',
+                'maestro',
+                'ideal',
+                'paysafecard',
+                'resurs',
+                'vipps'
+            ];
+
+            foreach ($module_payment_options as $option) {
+                $cost = (MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE == "No" || $option == 'viabill' ? "0" : "1");
+                if($option=="creditcard"){
+                    $optscount++;
+
+                    foreach ($module_available_cards as $optionc) {
+                        $iconc ="";
+                        $iconc = (file_exists(DIR_WS_ICONS . $optionc . ".png") ? (DIR_WS_ICONS . $optionc . ".png") : ($iconc));
+                        $iconc = (file_exists(DIR_WS_ICONS . $optionc . ".jpg") ? (DIR_WS_ICONS . $optionc . ".jpg") : ($iconc));
+                        $iconc = (file_exists(DIR_WS_ICONS . $optionc . ".gif") ? (DIR_WS_ICONS . $optionc . ".gif") : ($iconc));
+                        //define payment icon width
+                        $w= 35;
+                        $h= 22;
+                        $space = 5;
+
+                        $msg .= tep_image($iconc, $optionc, $w, $h, 'style="position:relative;border:0px;float:left;margin:' . $space . 'px;" ');
+                    }
+                    $options_text=$msg;
+
+                    $selection['fields'][] = array(
+                        'title' => '<table width="100%" border="0">
+                                        <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
+                                            <td class="main" style="height:22px;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;">(+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                </td>
+                                        </tr>'.'
+                                    </table>',
+                        'field' => tep_draw_radio_field('qp_card', '', ($option == $cardlock ? true : false), ' onClick="setQuickPay(); document.checkout_payment.cardlock.value = \'' . $option . '\';" ')
+                    );
+                }
+
+                if($option != "creditcard"){
+                    /**
+                     * Upload images to images/icons corresponding to your chosen cardlock groups in your payment module settings
+                     * OPTIONAL image if different from cardlogo, add _payment to filename
+                     */
+
+                    $selectedopts = explode(",", $option);
+                    $icon = "";
+                    foreach($selectedopts as $option){
+                        $optscount++;
+
+                        $icon = (file_exists(DIR_WS_ICONS . $option . ".png") ? DIR_WS_ICONS . $option . ".png" : $icon);
+                        $icon = (file_exists(DIR_WS_ICONS . $option . ".jpg") ? DIR_WS_ICONS . $option . ".jpg" : $icon);
+                        $icon = (file_exists(DIR_WS_ICONS . $option . ".gif") ? DIR_WS_ICONS . $option . ".gif" : $icon);
+                        $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.png") ? DIR_WS_ICONS . $option . "_payment.png" : $icon);
+                        $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.jpg") ? DIR_WS_ICONS . $option . "_payment.jpg" : $icon);
+                        $icon = (file_exists(DIR_WS_ICONS . $option . "_payment.gif") ? DIR_WS_ICONS . $option . "_payment.gif" : $icon);
+                        $space = 5;
+
+                        //define payment icon width
+                        if(strstr($icon, "_payment")){
+                            $w = 120;
+                            $h = 27;
+                            if(strstr($icon, "3d")){
+                                $w = 60;
+                            }
+                        }else{
+                            $w = 35;
+                            $h = 22;
+                        }
+
+                        $options_text = '<table width="100%">
+                                            <tr>
+                                                <td>'.tep_image($icon,$this->get_payment_options_name($option),$w,$h,' style="position:relative;border:0px;float:left;margin:'.$space.'px;" ').'</td>
+                                                <td style="height: 27px;white-space:nowrap;vertical-align:middle;" >' . $this->get_payment_options_name($option) . '</td>
+                                            </tr>
+                                        </table>';
+
+                        $selection['fields'][] = array(
+                            'title' => '<table width="100%" border="0">
+                                            <tr class="moduleRow table-selection" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectQuickPayRowEffect(this, ' . ($optscount-1) . ',\''.$option.'\')">
+                                                <td class="main" style="height: 27px;white-space:nowrap;vertical-align:middle;">' . $options_text.($cost !=0 ? '</td><td style="height:22px;vertical-align:middle;"> (+ '.MODULE_PAYMENT_QUICKPAY_ADVANCED_FEELOCKINFO.')' :'').'
+                                                    </td>
+                                            </tr>'.'
+                                        </table>',
+                            'field' => tep_draw_radio_field('qp_card', '', ($option == $cardlock ? true : false), ' onClick="setQuickPay();document.checkout_payment.cardlock.value = \'' . $option . '\';" ')
+                        );
+                    }
+                }
+            }
         }
+
 
         $js_function = '
             <script language="javascript"><!--
@@ -1347,7 +1476,7 @@ EOT;
             case 'visa-dk': return MODULE_PAYMENT_QUICKPAY_ADVANCED_VISA_DK_TEXT;
             case 'visa-electron': return MODULE_PAYMENT_QUICKPAY_ADVANCED_VISA_ELECTRON_TEXT;
             case 'visa-electron-dk': return MODULE_PAYMENT_QUICKPAY_ADVANCED_VISA_ELECTRON_DK_TEXT;
-            case 'viabill':  return MODULE_PAYMENT_QUICKPAY_ADVANCED_VIABILL_TEXT;
+            case 'viabill': return MODULE_PAYMENT_QUICKPAY_ADVANCED_VIABILL_TEXT;
             case 'fbg1886': return MODULE_PAYMENT_QUICKPAY_ADVANCED_FBG1886_TEXT;
             case 'paypal': return MODULE_PAYMENT_QUICKPAY_ADVANCED_PAYPAL_TEXT;
             case 'sofort': return MODULE_PAYMENT_QUICKPAY_ADVANCED_SOFORT_TEXT;
