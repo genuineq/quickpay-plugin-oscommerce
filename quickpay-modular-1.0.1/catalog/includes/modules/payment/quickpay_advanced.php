@@ -21,6 +21,37 @@ if (!defined('FILENAME_CHECKOUT_PROCESS')) define('FILENAME_CHECKOUT_PROCESS','c
 if (!defined('FILENAME_CHECKOUT_SUCCESS')) define('FILENAME_CHECKOUT_SUCCESS','checkout_success.php');
 if (!defined('FILENAME_SHIPPING')) define('FILENAME_SHIPPING','shipping.php');
 
+/** You can extend the following cards-array and upload corresponding titled images to images/icons */
+if (!defined('MODULE_AVAILABLE_CREDITCARDS'))
+define('MODULE_AVAILABLE_CREDITCARDS',array(
+    '3d-dankort',
+    '3d-jcb',
+    '3d-visa',
+    '3d-mastercard',
+    'mastercard',
+    'mastercard-debet',
+    'american-express',
+    'dankort',
+    'diners',
+    'jcb',
+    'visa',
+    'visa-electron',
+    'viabill',
+    'fbg1886',
+    'paypal',
+    'sofort',
+    'mobilepay',
+    'bitcoin',
+    'swish',
+    'trustly',
+    'klarna',
+    'maestro',
+    'ideal',
+    'paysafecard',
+    'resurs',
+    'vipps',
+));
+
 include(DIR_FS_CATALOG.DIR_WS_CLASSES.'QuickpayApi.php');
 
 class quickpay_advanced {
@@ -143,36 +174,6 @@ class quickpay_advanced {
         global $order, $currencies, $qp_card, $cardlock;
         $qty_groups = 0;
 
-        /** You can extend the following cards-array and upload corresponding titled images to images/icons */
-        $module_available_cards = [
-            '3d-dankort',
-            '3d-jcb',
-            '3d-visa',
-            '3d-mastercard',
-            'mastercard',
-            'mastercard-debet',
-            'american-express',
-            'dankort',
-            'diners',
-            'jcb',
-            'visa',
-            'visa-electron',
-            'viabill',
-            'fbg1886',
-            'paypal',
-            'sofort',
-            'mobilepay',
-            'bitcoin',
-            'swish',
-            'trustly',
-            'klarna',
-            'maestro',
-            'ideal',
-            'paysafecard',
-            'resurs',
-            'vipps',
-        ];
-
         /** Count how many MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP are configured. */
         for ($i = 1; $i <= $this->num_groups; $i++) {
             if (constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) == '') {
@@ -187,7 +188,7 @@ class quickpay_advanced {
 
             /** Parse all the configured MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP */
             $selection['fields'] = array();
-            $msg = '';
+            $msg = '<table width="100%"><tr><td>';
             $optscount=0;
             for ($i = 1; $i <= $this->num_groups; $i++) {
                 $options_text = '';
@@ -197,8 +198,9 @@ class quickpay_advanced {
                         $cost = (MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE == "No" || $option == 'viabill' ? "0" : "1");
                         if($option=="creditcard"){
                             $optscount++;
-
-                            foreach ($module_available_cards as $optionc) {
+                            /** Read the logos defined on admin panel **/
+                            $cards = explode(";",MODULE_PAYMENT_QUICKPAY_CARD_LOGOS);
+                            foreach ($cards as $optionc) {
                                 $iconc ="";
                                 $iconc = (file_exists(DIR_WS_ICONS.$optionc.".png") ? DIR_WS_ICONS.$optionc.".png": $iconc);
                                 $iconc = (file_exists(DIR_WS_ICONS.$optionc.".jpg") ? DIR_WS_ICONS.$optionc.".jpg": $iconc);
@@ -209,10 +211,10 @@ class quickpay_advanced {
                                 $space = 5;
 
                                 $msg .= tep_image($iconc,$optionc,$w,$h,'style="position:relative;border:0px;float:left;margin:'.$space.'px;" ');
-
-
                             }
-                            $options_text=$msg;
+                            
+                            $msg .= $this->get_payment_options_name($option).'</td></tr></table>';
+                  					$options_text=$msg;
 
                             // $cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
 
@@ -369,7 +371,8 @@ class quickpay_advanced {
                 if($option=="creditcard"){
                     $optscount++;
 
-                    foreach ($module_available_cards as $optionc) {
+                    $cards = explode(";",MODULE_PAYMENT_QUICKPAY_CARD_LOGOS);
+                    foreach ($cards as $optionc) {
                         $iconc ="";
                         $iconc = (file_exists(DIR_WS_ICONS . $optionc . ".png") ? (DIR_WS_ICONS . $optionc . ".png") : ($iconc));
                         $iconc = (file_exists(DIR_WS_ICONS . $optionc . ".jpg") ? (DIR_WS_ICONS . $optionc . ".jpg") : ($iconc));
@@ -1390,6 +1393,9 @@ EOT;
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Quickpay Acknowledged Order Status', 'MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDER_STATUS_ID', '" . $status_pending_id . "', 'Set the status of orders made with this payment module to this value', '6', '0', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
 
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Quickpay Rejected Order Status', 'MODULE_PAYMENT_QUICKPAY_ADVANCED_REJECTED_ORDER_STATUS_ID', '" . $status_rejected_id . "', 'Set the status of rejected orders made with this payment module to this value', '6', '0', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
+
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Credit Card Logos', 'MODULE_PAYMENT_QUICKPAY_CARD_LOGOS', '".implode(";",MODULE_AVAILABLE_CREDITCARDS)."', 'Images related to Credit Card Payment Method. Drag & Drop to change the visibility/order', '4', '0', 'show_logos', 'edit_logos(', now())");
+
     }
 
 
@@ -1413,7 +1419,8 @@ EOT;
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION',
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE',
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOCAPTURE',
-            'MODULE_PAYMENT_QUICKPAY_ADVANCED_MODE'
+            'MODULE_PAYMENT_QUICKPAY_ADVANCED_MODE',
+            'MODULE_PAYMENT_QUICKPAY_CARD_LOGOS'
         );
 
         for ($i = 1; $i <= $this->num_groups; $i++) {
@@ -1548,6 +1555,139 @@ EOT;
 
         return $message;
     }
+}
+
+/** Display logos in the admin panel in view state */
+function show_logos($text) {
+    $w= 55;
+    $h= 'auto';
+    $output = '';
+
+    if ( !empty($text) ) {
+        $output = '<ul style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
+
+        $options = explode(';', $text);
+        foreach ($options as $optionc) {
+            $iconc ="";
+            $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".png") ? DIR_WS_CATALOG_IMAGES . 'icons/'.$optionc.".png": $iconc);
+            $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".jpg") ? DIR_WS_CATALOG_IMAGES . 'icons/'.$optionc.".jpg": $iconc);
+            $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".gif") ? DIR_WS_CATALOG_IMAGES . 'icons/'.$optionc.".gif": $iconc);
+            if(strlen($iconc))
+              $output .= '<li style="padding: 2px;">' . tep_image($iconc, $optionc , $w, $h) . '</li>';
+          }
+
+          $output .= '</ul>';
+    }
+
+    return $output;
+}
+
+/** Display logos in the admin panel in edit state */
+function edit_logos($values, $key) {
+    $w= 55;
+    $h= 'auto';
+
+    /** Scan images directory for logos */
+    $files_array = array();
+    if ( $dir = @dir(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons') ) {
+      while ( $file = $dir->read() ) {
+          /** Check if image is valid */
+          if ( !is_dir(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/' . $file ) && in_array(explode('.',$file)[0],MODULE_AVAILABLE_CREDITCARDS)) {
+              if (in_array(substr($file, strrpos($file, '.')+1), array('gif', 'jpg', 'png')) ) {
+                  $files_array[] = $file;
+              }
+          }
+      }
+      sort($files_array);
+      $dir->close();
+  }
+
+  /** Display logos to be shown */
+  $values_array = !empty($values) ? explode(';', $values) : array();
+  $output = '<h3>' . MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_SHOWN_CARDS . '</h3>' .
+            '<ul id="ca_logos" style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
+
+  foreach ($values_array as $optionc) {
+      $iconc ="";
+      $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".png") ? DIR_WS_CATALOG_IMAGES . 'icons/' . $optionc.".png": $iconc);
+      $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".jpg") ? DIR_WS_CATALOG_IMAGES . 'icons/' . $optionc.".jpg": $iconc);
+      $iconc = (file_exists(DIR_FS_CATALOG . DIR_WS_IMAGES . 'icons/'.$optionc.".gif") ? DIR_WS_CATALOG_IMAGES . 'icons/' . $optionc.".gif": $iconc);
+      if(strlen($iconc))
+          $output .= '<li style="padding: 2px;">' . tep_image($iconc, $optionc, $w, $h) . tep_draw_hidden_field('bm_card_acceptance_logos[]', $optionc) . '</li>';
+  }
+
+  $output .= '</ul>';
+
+  /** Display available logos */
+  $output .= '<h3>' . MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_NEW_CARDS . '</h3><ul id="new_ca_logos" style="list-style-type: none; margin: 0; padding: 5px; margin-bottom: 10px;">';
+  foreach ($files_array as $file) {
+      /** Check if logo is not already displayed in "Available list" */
+      if ( !in_array(explode(".",$file)[0], $values_array) ) {
+          $output .= '<li style="padding: 2px;">' . tep_image(DIR_WS_CATALOG_IMAGES . 'icons/' . $file, explode(".",$file)[0], $w, $h) . tep_draw_hidden_field('bm_card_acceptance_logos[]', explode(".",$file)[0]) . '</li>';
+      }
+  }
+
+  $output .= '</ul>';
+
+  $output .= tep_draw_hidden_field('configuration[' . $key . ']', '', 'id="ca_logo_cards"');
+
+  $drag_here_li = '<li id="caLogoEmpty" style="background-color: #fcf8e3; border: 1px #faedd0 solid; color: #a67d57; padding: 5px;">' . addslashes(MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_DRAG_HERE) . '</li>';
+
+  /** Drag and Drop logic */
+  $output .= <<<EOD
+      <script>
+      $(function() {
+      var drag_here_li = '{$drag_here_li}';
+
+      if ( $('#ca_logos li').size() < 1 ) {
+        $('#ca_logos').append(drag_here_li);
+      }
+
+      $('#ca_logos').sortable({
+        connectWith: '#new_ca_logos',
+        items: 'li:not("#caLogoEmpty")',
+        stop: function (event, ui) {
+          if ( $('#ca_logos li').size() < 1 ) {
+            $('#ca_logos').append(drag_here_li);
+          } else if ( $('#caLogoEmpty').length > 0 ) {
+            $('#caLogoEmpty').remove();
+          }
+        }
+      });
+
+      $('#new_ca_logos').sortable({
+        connectWith: '#ca_logos',
+        stop: function (event, ui) {
+          if ( $('#ca_logos li').size() < 1 ) {
+            $('#ca_logos').append(drag_here_li);
+          } else if ( $('#caLogoEmpty').length > 0 ) {
+            $('#caLogoEmpty').remove();
+          }
+        }
+      });
+
+      $('#ca_logos, #new_ca_logos').disableSelection();
+
+      $('form[name="modules"]').submit(function(event) {
+        var ca_selected_cards = '';
+
+        if ( $('#ca_logos li').size() > 0 ) {
+          $('#ca_logos li input[name="bm_card_acceptance_logos[]"]').each(function() {
+            ca_selected_cards += $(this).attr('value') + ';';
+          });
+        }
+
+        if (ca_selected_cards.length > 0) {
+          ca_selected_cards = ca_selected_cards.substring(0, ca_selected_cards.length - 1);
+        }
+
+        $('#ca_logo_cards').val(ca_selected_cards);
+      });
+      });
+      </script>
+EOD;
+
+    return $output;
 }
 
  //redundant, but maybe reuse theese functions in the future?
