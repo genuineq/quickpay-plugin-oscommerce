@@ -212,7 +212,7 @@ class quickpay_advanced {
 
                                 $msg .= tep_image($iconc,$optionc,$w,$h,'style="position:relative;border:0px;float:left;margin:'.$space.'px;" ');
                             }
-                            
+
                             $msg .= $this->get_payment_options_name($option).'</td></tr></table>';
                   					$options_text=$msg;
 
@@ -384,6 +384,7 @@ class quickpay_advanced {
 
                         $msg .= tep_image($iconc, $optionc, $w, $h, 'style="position:relative;border:0px;float:left;margin:' . $space . 'px;" ');
                     }
+                    $msg .= $this->get_payment_options_name($option);
                     $options_text=$msg;
 
                     $selection['fields'][] = array(
