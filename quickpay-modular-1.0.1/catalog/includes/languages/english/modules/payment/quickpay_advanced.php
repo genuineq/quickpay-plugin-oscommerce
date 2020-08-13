@@ -26,7 +26,7 @@ if (!defined('TEXT_RETURN_POLICY')) define('TEXT_RETURN_POLICY','Summary of retu
 if (!defined('ACCEPT_CONDITIONS')) define('ACCEPT_CONDITIONS','I have read and agree to the terms &amp; conditions: ');
 if (!defined('CONDITION_AGREEMENT_ERROR')) define('CONDITION_AGREEMENT_ERROR','Please agree to our terms & conditions before placing your order.');
 
-// Transaction errors
+/* Transaction errors */
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_ERROR_MERCHANT_UNKNOWN', 'Unknown Merchant Number');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_ERROR_CARDNO_NOT_VALID', 'Invalid card number');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_ERROR_CVC_NOT_VALID', 'Invalid control digits');
@@ -62,7 +62,7 @@ define('MODULE_PAYMENT_QUICKPAY_ADVANCED_VISA_DEBET_DK_3D_TEXT', 'Visacard Debit
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_CREDITCARD_3D_TEXT', 'Creditcards 3D-secure');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_DANKORT_3D_TEXT', 'Dankort 3D-secure');
 
-// Name of credit cards options
+/* Name of credit cards options */
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_AMERICAN_EXPRESS_TEXT', 'American Express');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_AMERICAN_EXPRESS_DK_TEXT', 'American Express (Danish)');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_DANKORT_TEXT', 'Dankort');
@@ -92,6 +92,10 @@ define('MODULE_PAYMENT_QUICKPAY_ADVANCED_IDEAL_TEXT', 'Ideal');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_PAYSAFECARD_TEXT', 'Paysafecard');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_RESURS_TEXT', 'Resurs');
 define('MODULE_PAYMENT_QUICKPAY_ADVANCED_VIPPS_TEXT', 'Vipps');
+/* Admin pannel > creditcard logos configuration */
+define('MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_SHOWN_CARDS', 'Shown logos');
+define('MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_NEW_CARDS', 'Available logos');
+define('MODULE_PAYMENT_QUICKPAY_CARD_LOGOS_DRAG_HERE', 'Drag here');
 
 // define('MODULE_PAYMENT_QUICKPAY_ADVANCED_DANSKE_DK_TEXT', 'Danske Netbank');
 // define('MODULE_PAYMENT_QUICKPAY_ADVANCED_EDANKORT_TEXT', 'eDankort');
