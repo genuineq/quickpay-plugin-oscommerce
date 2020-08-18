@@ -363,18 +363,20 @@ class quickpay_advanced {
                     setQuickPay();
                 }
 
-                /* For each payment method */
-                document.checkout_payment.payment.forEach(function(node) {
-                  /* Apply for radio input and for his parent row */
-                  [node, node.parentElement.parentElement].forEach(item => {
-                    /* When a payment method is selected deselect all subpayment methods */
-                    item.addEventListener("click", function() {
-                        document.checkout_payment.qp_card.forEach(function(sub_node) {
-                            sub_node.checked=false;
+                document.addEventListener("DOMContentLoaded", function(){
+                    /* For each payment method */
+                    document.checkout_payment.payment.forEach(function(node) {
+                      /* Apply for radio input and for his parent row */
+                      [node, node.parentElement.parentElement].forEach(item => {
+                        /* When a payment method is selected deselect all subpayment methods */
+                        item.addEventListener("click", function() {
+                            document.checkout_payment.qp_card.forEach(function(sub_node) {
+                                sub_node.checked=false;
+                            });
                         });
-                    });
-                  })
-                })
+                      })
+                    })
+                });
 
             //--></script>';
 
