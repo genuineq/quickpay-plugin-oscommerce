@@ -94,6 +94,7 @@ class quickpay_advanced {
                 }
             }
         }
+
 //V10
         if($_POST['quickpayIT'] == "go" && !isset($_SESSION['qlink'])) {
             $this->form_action_url = 'https://payment.quickpay.net/';
@@ -183,6 +184,7 @@ class quickpay_advanced {
             $qty_groups++;
         }
 
+
         if($qty_groups > 1) {
             $selection = array('id' => $this->code, 'module' => $this->title. tep_draw_hidden_field('cardlock', $cardlock ));
         }
@@ -195,6 +197,7 @@ class quickpay_advanced {
             $options_text = '';
             if (defined('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) && constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i) != '') {
                 $payment_options = preg_split('[\,\;]', constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i));
+
                 foreach ($payment_options as $option) {
                     $cost = (MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE == "No" || $option == 'viabill' ? "0" : "1");
                     if($option=="creditcard"){
@@ -219,8 +222,14 @@ class quickpay_advanced {
                             $msg .= tep_image($iconc,$optionc,$w,$h,'style="position:relative;border:0px;float:left;margin:'.$space.'px;" ');
                         }
 
-                        $msg .= $this->get_payment_options_name($option).'</td></tr></table>';
-              					$options_text=$msg;
+                        /** Configuring the text to be shown for the payment group. If there is an input in the text field for that payment option, that value will be shown to the user, otherwise, the default value will be used.*/ 
+                        if(defined('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP'.$i.'_TEXT') && constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_TEXT') != ''){
+                            $msg .= constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_TEXT').'</td></tr></table>';    
+                        }else {
+                            $msg .= $this->get_payment_options_name($option).'</td></tr></table>';  
+                        }
+
+                        $options_text=$msg;
 
                         //$cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
                         if($qty_groups==1){
@@ -289,12 +298,20 @@ class quickpay_advanced {
                             }
 
                             //$cost = $this->calculate_order_fee($order->info['total'], $fees[$i]);
+
+                            /** Configuring the text to be shown for the payment option. */
                             $options_text = '<table width="100%">
                                                 <tr>
                                                     <td>'.tep_image($icon,$this->get_payment_options_name($option),$w,$h,' style="position:relative;border:0px;float:left;margin:'.$space.'px;" ').'</td>
-                                                    <td style="height: 27px;white-space:nowrap;vertical-align:middle;" >' . $this->get_payment_options_name($option) . '</td>
-                                                </tr>
-                                            </table>';
+                                                    <td style="height: 27px;white-space:nowrap;vertical-align:middle;" >';
+
+                            /** If there is an input in the text field for that payment option, that value will be shown to the user, otherwise, the default value will be used. */                                                    
+                            if(defined('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP'.$i.'_TEXT') && constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_TEXT') != ''){
+                                $options_text .= constant('MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_TEXT').'</td></tr></table>';    
+                            }else {
+                                $options_text .= $this->get_payment_options_name($option).'</td></tr></table>';  
+                            }
+
 
                             if($qty_groups==1){
                                 $selection = array(
@@ -1263,9 +1280,13 @@ EOT;
             }
 
             $qp_group = (defined('MODULE_PAYMENT_QUICKPAY_GROUP' . $i)) ? constant('MODULE_PAYMENT_QUICKPAY_GROUP' . $i) : $defaultlock;
+
             // $qp_groupfee = (defined('MODULE_PAYMENT_QUICKPAY_GROUP' . $i . '_FEE')) ? constant('MODULE_PAYMENT_QUICKPAY_GROUP' . $i . '_FEE') : $qp_groupfee;
 
             tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Group " . $i . " Payment Options ', 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP" . $i . "', '" . $qp_group . "', 'Comma seperated Quickpay payment options that are included in Group " . $i . ", maximum 255 chars (<a href=\'http://tech.quickpay.net/appendixes/payment-methods\' target=\'_blank\'><u>available options</u></a>)<br>Example: creditcard OR viabill OR dankort<br>', '6', '6', now())");
+
+            tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Group " . $i . " Payment Text ', 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP" . $i . "_TEXT', '" . "" . "', 'Define text to be displayed for Group " . $i . " Payment Option. If this is not defined, the default text will be shown.<br>', '6', '6', now())");
+
             // tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Group " . $i . " Payments fee', 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP" . $i . "_FEE', '" . $qp_groupfee . "', 'Fee for Group " . $i . " payments (fixed fee:percentage fee)<br>Example: <b>1.45:0.10</b>', '6', '6', now())");
         }
 
@@ -1306,11 +1327,15 @@ EOT;
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOFEE',
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_AUTOCAPTURE',
             'MODULE_PAYMENT_QUICKPAY_ADVANCED_MODE',
-            'MODULE_PAYMENT_QUICKPAY_CARD_LOGOS'
+            'MODULE_PAYMENT_QUICKPAY_CARD_LOGOS',
         );
 
         for ($i = 1; $i <= $this->num_groups; $i++) {
             $keys[] = 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i;
+
+            $keys[] = 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP'. $i. '_TEXT';
+            
+
             // $keys[] = 'MODULE_PAYMENT_QUICKPAY_ADVANCED_GROUP' . $i . '_FEE';
         }
 
