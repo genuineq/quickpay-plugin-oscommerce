@@ -734,36 +734,57 @@ EOT;
         // $qp_reference_title = $qp_order_id;
         // $qp_vat_amount = ($order->info['tax'] ? $order->info['tax'] : "0.00");
 
+        //query for country codes in the database:
+        $country = isset($order->delivery['country']['title'])?$order->delivery['country']['title']:'';
+        $countries_query = tep_db_query("select countries_iso_code_3 from " . TABLE_COUNTRIES ." where countries_name = '" . $country . "'");
+        $country_code = tep_db_fetch_array($countries_query)["countries_iso_code_3"];
+
         //custom vars
         $varsvalues = array(
             'variables[customers_id]' => $customer_id,
-            'variables[customers_name]' => $order->customer['firstname'] . ' ' . $order->customer['lastname'],
-            'variables[customers_company]' => $order->customer['company'],
-            'variables[customers_street_address]' => $order->customer['street_address'],
-            'variables[customers_suburb]' => $order->customer['suburb'],
-            'variables[customers_city]' => $order->customer['city'],
-            'variables[customers_postcode]' => $order->customer['postcode'],
-            'variables[customers_state]' => $order->customer['state'],
-            'variables[customers_country]' => $order->customer['country']['title'],
-            'variables[customers_telephone]' => $order->customer['telephone'],
-            'variables[customers_email_address]' => $order->customer['email_address'],
-            'variables[delivery_name]' => $order->delivery['firstname'] . ' ' . $order->delivery['lastname'],
-            'variables[delivery_company]' => $order->delivery['company'],
-            'variables[delivery_street_address]' => $order->delivery['street_address'],
-            'variables[delivery_suburb]' => $order->delivery['suburb'],
-            'variables[delivery_city]' => $order->delivery['city'],
-            'variables[delivery_postcode]' => $order->delivery['postcode'],
-            'variables[delivery_state]' => $order->delivery['state'],
-            'variables[delivery_country]' => $order->delivery['country']['title'],
-            'variables[delivery_address_format_id]' => $order->delivery['format_id'],
-            'variables[billing_name]' => $order->billing['firstname'] . ' ' . $order->billing['lastname'],
-            'variables[billing_company]' => $order->billing['company'],
-            'variables[billing_street_address]' => $order->billing['street_address'],
-            'variables[billing_suburb]' => $order->billing['suburb'],
-            'variables[billing_city]' => $order->billing['city'],
-            'variables[billing_postcode]' => $order->billing['postcode'],
-            'variables[billing_state]' => $order->billing['state'],
-            'variables[billing_country]' => $order->billing['country']['title']
+            'variables[customers_name]' =>  (isset($order->customer['firstname'])?$order->customer['firstname']:'') . ' ' . (isset($order->customer['lastname'])?$order->customer['lastname']:''),
+            'variables[customers_company]' => isset($order->customer['company'])?$order->customer['company']:'',
+            'variables[customers_street_address]' => isset($order->customer['street_address'])?$order->customer['street_address']:'',
+            'variables[customers_suburb]' => isset($order->customer['suburb'])?$order->customer['suburb']:'',
+            'variables[customers_city]' => isset($order->customer['city'])?$order->customer['city']:'',
+            'variables[customers_postcode]' => isset($order->customer['postcode'])?$order->customer['postcode']:'',
+            'variables[customers_state]' => isset($order->customer['state'])?$order->customer['state']:'',
+            'variables[customers_country]' => isset($order->customer['country']['title'])?$order->customer['country']['title']:'',
+            'variables[customers_telephone]' => isset($order->customer['telephone'])?$order->customer['telephone']:'',
+            'variables[customers_email_address]' => isset($order->customer['email_address'])?$order->customer['email_address']:'',
+            'variables[delivery_name]' => (isset($order->delivery['firstname'])?$order->delivery['firstname']:'') . ' ' . (isset($order->delivery['lastname'])?$order->delivery['lastname']:''),
+            'variables[delivery_company]' => isset($order->delivery['company'])?$order->delivery['company']:'',
+            'variables[delivery_street_address]' => isset($order->delivery['street_address'])?$order->delivery['street_address']:'',
+            'variables[delivery_suburb]' => isset($order->delivery['suburb'])?$order->delivery['suburb']:'',
+            'variables[delivery_city]' => isset($order->delivery['city'])?$order->delivery['city']:'',
+            'variables[delivery_postcode]' => isset($order->delivery['postcode'])?$order->delivery['postcode']:'',
+            'variables[delivery_state]' => isset($order->delivery['state'])?$order->delivery['state']:'',
+            'variables[delivery_country]' => isset($order->delivery['country']['title'])?$order->delivery['country']['title']:'',
+            'variables[delivery_address_format_id]' => isset($order->delivery['format_id'])?$order->delivery['format_id']:'',
+            'variables[billing_name]' => (isset($order->billing['firstname'])?$order->billing['firstname']:'') . ' ' . (isset($order->billing['lastname'])?$order->billing['lastname']:''),
+            'variables[billing_company]' => isset($order->billing['company'])?$order->billing['company']:'',
+            'variables[billing_street_address]' => isset($order->billing['street_address'])?$order->billing['street_address']:'',
+            'variables[billing_suburb]' => isset($order->billing['suburb'])?$order->billing['suburb']:'',
+            'variables[billing_city]' => isset($order->billing['city'])?$order->billing['city']:'',
+            'variables[billing_postcode]' => isset($order->billing['postcode'])?$order->billing['postcode']:'',
+            'variables[billing_state]' => isset($order->billing['state'])?$order->billing['state']:'',
+            'variables[billing_country]' => isset($order->billing['country']['title'])?$order->billing['country']['title']:'',
+
+            'shipping[name]' => (isset($order->delivery['firstname'])?$order->delivery['firstname']:'') . ' ' . (isset($order->delivery['lastname'])?$order->delivery['lastname']:''),
+            'shipping[company_name]' => isset($order->delivery['company'])?$order->delivery['company']:'',
+            'shipping[street]' => isset($order->delivery['street_address'])?$order->delivery['street_address']:'',
+            'shipping[city]' => isset($order->delivery['city'])?$order->delivery['city']:'',
+            'shipping[zip_code]' => isset($order->delivery['postcode'])?$order->delivery['postcode']:'',
+            'shipping[region]' => isset($order->delivery['state'])?$order->delivery['state']:'',
+            'shipping[country_code]' => $country_code,
+
+            'invoice[name]' => (isset($order->billing['firstname'])?$order->billing['firstname']:'') . ' ' . (isset($order->billing['lastname'])?$order->billing['lastname']:''),
+            'invoice[company_name]' => isset($order->billing['company'])?$order->billing['company']:'',
+            'invoice[street]' => isset($order->billing['street_address'])?$order->billing['street_address']:'',
+            'invoice[city]' => isset($order->billing['city'])?$order->billing['city']:'',
+            'invoice[zip_code]' => isset($order->billing['postcode'])?$order->billing['postcode']:'',
+            'invoice[region]' => isset($order->billing['state'])?$order->billing['state']:'',
+            'invoice[country_code]' => $country_code,
         );
 
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
@@ -816,6 +837,9 @@ EOT;
 
         $varsvalues["variables[products]"] = html_entity_decode($ps);
         $varsvalues["variables[shopsystem]"] = "OsCommerce";
+
+        $varsvalues["shopsystem[name]"] = "OsCommerce";
+        $varsvalues["shopsystem[version]"] = "1.0.4";
         //end custom vars
 
         // register fields to hand over
