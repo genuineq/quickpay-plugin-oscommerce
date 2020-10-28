@@ -734,7 +734,7 @@ EOT;
         // $qp_reference_title = $qp_order_id;
         // $qp_vat_amount = ($order->info['tax'] ? $order->info['tax'] : "0.00");
 
-        //query for country codes in the database:
+        /** query for country codes in the database: */
         $country = isset($order->delivery['country']['title'])?$order->delivery['country']['title']:'';
         $countries_query = tep_db_query("select countries_iso_code_3 from " . TABLE_COUNTRIES ." where countries_name = '" . $country . "'");
         $country_code = tep_db_fetch_array($countries_query)["countries_iso_code_3"];
