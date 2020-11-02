@@ -798,8 +798,6 @@ EOT;
             'shipping_address[email]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
         );
 
-        // $basket = [];
-
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
             $order_products_id = tep_get_prid($order->products[$i]['id']);
 
@@ -840,28 +838,7 @@ EOT;
             $total_cost += $total_products_price;
 
             $products_ordered[] = $order->products[$i]['qty'] . ' x ' . $order->products[$i]['name'] . ' (' . $order->products[$i]['model'] . ') = ' . $currencies->display_price($order->products[$i]['final_price'], $order->products[$i]['tax'], $order->products[$i]['qty']) . $products_ordered_attributes . "-";
-
-            // $product = [
-            //     "qty" => $order->products[$i]['qty'],
-            //     "item_no" => $order->products[$i]['id'],
-            //     "item_name" => $order->products[$i]['name'],
-            //     "item_price" => $order->products[$i]['final_price'],
-            //     "vat_rate" => ''
-            // ];
-
-            // $basket[] = $product;
-
-            // $varsvalues["basket[][qty]"] = $order->products[$i]['qty'];
-            // $varsvalues["basket[][item_no]"] = $order->products[$i]['id'];
-            // $varsvalues["basket[][item_name]"] = $order->products[$i]['name'];
-            // $varsvalues["basket[][item_price]"] = $order->products[$i]['final_price'];
-            // $varsvalues["basket[][vat_rate]"] = '';
-
         }
-
-        // $varsvalues["basket"] = print_r($basket, true);
-
-        // echo '<pre>'.print_r($varsvalues,1).'</pre>';die();
 
         $ps="";
         while (list ($key, $value) = each($products_ordered)) {
@@ -903,6 +880,7 @@ EOT;
 
 
         $process_parameters = array_merge($process_parameters, $varsvalues);
+
         // $dumpvar = "-- get process parameters\n";
         // $dumpvar .= print_r($process_parameters,true)."\n";
 
