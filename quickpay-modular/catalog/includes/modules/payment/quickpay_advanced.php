@@ -737,66 +737,68 @@ EOT;
         //custom vars
         $varsvalues = array(
             'variables[customers_id]' => $customer_id,
-            'variables[customers_name]' =>  (isset($order->customer['firstname'])?$order->customer['firstname']:'') . ' ' . (isset($order->customer['lastname'])?$order->customer['lastname']:''),
-            'variables[customers_company]' => isset($order->customer['company'])?$order->customer['company']:'',
-            'variables[customers_street_address]' => isset($order->customer['street_address'])?$order->customer['street_address']:'',
-            'variables[customers_suburb]' => isset($order->customer['suburb'])?$order->customer['suburb']:'',
-            'variables[customers_city]' => isset($order->customer['city'])?$order->customer['city']:'',
-            'variables[customers_postcode]' => isset($order->customer['postcode'])?$order->customer['postcode']:'',
-            'variables[customers_state]' => isset($order->customer['state'])?$order->customer['state']:'',
-            'variables[customers_country]' => isset($order->customer['country']['title'])?$order->customer['country']['title']:'',
-            'variables[customers_telephone]' => isset($order->customer['telephone'])?$order->customer['telephone']:'',
-            'variables[customers_email_address]' => isset($order->customer['email_address'])?$order->customer['email_address']:'',
-            'variables[delivery_name]' => (isset($order->delivery['firstname'])?$order->delivery['firstname']:'') . ' ' . (isset($order->delivery['lastname'])?$order->delivery['lastname']:''),
-            'variables[delivery_company]' => isset($order->delivery['company'])?$order->delivery['company']:'',
-            'variables[delivery_street_address]' => isset($order->delivery['street_address'])?$order->delivery['street_address']:'',
-            'variables[delivery_suburb]' => isset($order->delivery['suburb'])?$order->delivery['suburb']:'',
-            'variables[delivery_city]' => isset($order->delivery['city'])?$order->delivery['city']:'',
-            'variables[delivery_postcode]' => isset($order->delivery['postcode'])?$order->delivery['postcode']:'',
-            'variables[delivery_state]' => isset($order->delivery['state'])?$order->delivery['state']:'',
-            'variables[delivery_country]' => isset($order->delivery['country']['title'])?$order->delivery['country']['title']:'',
-            'variables[delivery_address_format_id]' => isset($order->delivery['format_id'])?$order->delivery['format_id']:'',
-            'variables[billing_name]' => (isset($order->billing['firstname'])?$order->billing['firstname']:'') . ' ' . (isset($order->billing['lastname'])?$order->billing['lastname']:''),
-            'variables[billing_company]' => isset($order->billing['company'])?$order->billing['company']:'',
-            'variables[billing_street_address]' => isset($order->billing['street_address'])?$order->billing['street_address']:'',
-            'variables[billing_suburb]' => isset($order->billing['suburb'])?$order->billing['suburb']:'',
-            'variables[billing_city]' => isset($order->billing['city'])?$order->billing['city']:'',
-            'variables[billing_postcode]' => isset($order->billing['postcode'])?$order->billing['postcode']:'',
-            'variables[billing_state]' => isset($order->billing['state'])?$order->billing['state']:'',
-            'variables[billing_country]' => isset($order->billing['country']['title'])?$order->billing['country']['title']:'',
+            'variables[customers_name]' => ((isset($order->customer['firstname'])) ? ($order->customer['firstname']) : ('')) . ((isset($order->customer['lastname'])) ? (' ' . $order->customer['lastname']) : ('')),
+            'variables[customers_company]' => (isset($order->customer['company'])) ? ($order->customer['company']) : (''),
+            'variables[customers_street_address]' => (isset($order->customer['street_address'])) ? ($order->customer['street_address']) : (''),
+            'variables[customers_suburb]' => (isset($order->customer['suburb'])) ? ($order->customer['suburb']) : (''),
+            'variables[customers_city]' => (isset($order->customer['city'])) ? ($order->customer['city']) : (''),
+            'variables[customers_postcode]' => (isset($order->customer['postcode'])) ? ($order->customer['postcode']) : (''),
+            'variables[customers_state]' => (isset($order->customer['state'])) ? ($order->customer['state']) : (''),
+            'variables[customers_country]' => (isset($order->customer['country']['title'])) ? ($order->customer['country']['title']) : (''),
+            'variables[customers_telephone]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+            'variables[customers_email_address]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
 
-            'invoice_address[name]' => (isset($order->billing['firstname'])?$order->billing['firstname']:'') . ' ' . (isset($order->billing['lastname'])?$order->billing['lastname']:''),
+            'variables[delivery_name]' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->delivery['lastname'])) ? (' ' . $order->delivery['lastname']) : ('')),
+            'variables[delivery_company]' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
+            'variables[delivery_street_address]' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
+            'variables[delivery_suburb]' => (isset($order->delivery['suburb'])) ? ($order->delivery['suburb']) : (''),
+            'variables[delivery_city]' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
+            'variables[delivery_postcode]' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
+            'variables[delivery_state]' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
+            'variables[delivery_country]' => (isset($order->delivery['country']['title'])) ? ($order->delivery['country']['title']) : (''),
+            'variables[delivery_address_format_id]' => (isset($order->delivery['format_id'])) ? ($order->delivery['format_id']) : (''),
+
+            'variables[billing_name]' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
+            'variables[billing_company]' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
+            'variables[billing_street_address]' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
+            'variables[billing_suburb]' => (isset($order->billing['suburb'])) ? ($order->billing['suburb']) : (''),
+            'variables[billing_city]' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
+            'variables[billing_postcode]' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
+            'variables[billing_state]' => (isset($order->billing['state'])) ? ($order->billing['state']) : (''),
+            'variables[billing_country]' => (isset($order->billing['country']['title'])) ? ($order->billing['country']['title']) : (''),
+
+            'invoice_address[name]' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
             'invoice_address[att]' => '',
-            'invoice_address[company_name]' => isset($order->billing['company'])?$order->billing['company']:'',
-            'invoice_address[street]' => isset($order->billing['street_address'])?$order->billing['street_address']:'',
+            'invoice_address[company_name]' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
+            'invoice_address[street]' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
             'invoice_address[house_number]' => '',
             'invoice_address[house_extension]' => '',
-            'invoice_address[city]' => isset($order->billing['city'])?$order->billing['city']:'',
-            'invoice_address[zip_code]' => isset($order->billing['postcode'])?$order->billing['postcode']:'',
-            'invoice_address[region]' => isset($order->billing['state'])?$order->billing['state']:'',
-            'invoice_address[country_code]' => isset($order->billing['country']['iso_code_3'])?$order->billing['country']['iso_code_3']:'',
+            'invoice_address[city]' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
+            'invoice_address[zip_code]' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
+            'invoice_address[region]' => (isset($order->billing['state'])) ? ($order->billing['state']):9,
+            'invoice_address[country_code]' => (isset($order->billing['country']['iso_code_3'])) ? ($order->billing['country']['iso_code_3']) : (''),
             'invoice_address[vat_no]' => '',
             'invoice_address[phone_number]' => '',
-            'invoice_address[mobile_number]' => isset($order->customer['telephone'])?$order->customer['telephone']:'',
-            'invoice_address[email]' => isset($order->customer['email_address'])?$order->customer['email_address']:'',
+            'invoice_address[mobile_number]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+            'invoice_address[email]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
 
-            'shipping_address[name]' => (isset($order->delivery['firstname'])?$order->delivery['firstname']:'') . ' ' . (isset($order->billing['lastname'])?$order->billing['lastname']:''),
+            'shipping_address[name]' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
             'shipping_address[att]' => '',
-            'shipping_address[company_name]' => isset($order->delivery['company'])?$order->delivery['company']:'',
-            'shipping_address[street]' => isset($order->delivery['street_address'])?$order->delivery['street_address']:'',
+            'shipping_address[company_name]' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
+            'shipping_address[street]' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
             'shipping_address[house_number]' => '',
             'shipping_address[house_extension]' => '',
-            'shipping_address[city]' => isset($order->delivery['city'])?$order->delivery['city']:'',
-            'shipping_address[zip_code]' => isset($order->delivery['postcode'])?$order->delivery['postcode']:'',
-            'shipping_address[region]' => isset($order->delivery['state'])?$order->delivery['state']:'',
-            'shipping_address[country_code]' => isset($order->delivery['country']['iso_code_3'])?$order->delivery['country']['iso_code_3']:'',
+            'shipping_address[city]' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
+            'shipping_address[zip_code]' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
+            'shipping_address[region]' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
+            'shipping_address[country_code]' => (isset($order->delivery['country']['iso_code_3'])) ? ($order->delivery['country']['iso_code_3']) : (''),
             'shipping_address[vat_no]' => '',
             'shipping_address[phone_number]' => '',
-            'shipping_address[mobile_number]' => isset($order->customer['telephone'])?$order->customer['telephone']:'',
-            'shipping_address[email]' => isset($order->customer['email_address'])?$order->customer['email_address']:'',
+            'shipping_address[mobile_number]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+            'shipping_address[email]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
         );
 
-        $basket = [];
+        // $basket = [];
 
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
             $order_products_id = tep_get_prid($order->products[$i]['id']);
@@ -839,15 +841,15 @@ EOT;
 
             $products_ordered[] = $order->products[$i]['qty'] . ' x ' . $order->products[$i]['name'] . ' (' . $order->products[$i]['model'] . ') = ' . $currencies->display_price($order->products[$i]['final_price'], $order->products[$i]['tax'], $order->products[$i]['qty']) . $products_ordered_attributes . "-";
 
-            $product = [
-                "qty" => $order->products[$i]['qty'],
-                "item_no" => $order->products[$i]['id'],
-                "item_name" => $order->products[$i]['name'],
-                "item_price" => $order->products[$i]['final_price'],
-                "vat_rate" => ''
-            ];
+            // $product = [
+            //     "qty" => $order->products[$i]['qty'],
+            //     "item_no" => $order->products[$i]['id'],
+            //     "item_name" => $order->products[$i]['name'],
+            //     "item_price" => $order->products[$i]['final_price'],
+            //     "vat_rate" => ''
+            // ];
 
-            $basket[] = $product;
+            // $basket[] = $product;
 
             // $varsvalues["basket[][qty]"] = $order->products[$i]['qty'];
             // $varsvalues["basket[][item_no]"] = $order->products[$i]['id'];
@@ -857,9 +859,9 @@ EOT;
 
         }
 
-        $varsvalues["basket"] = $basket;
+        // $varsvalues["basket"] = print_r($basket, true);
 
-        echo '<pre>'.print_r($varsvalues,1).'</pre>';die();
+        // echo '<pre>'.print_r($varsvalues,1).'</pre>';die();
 
         $ps="";
         while (list ($key, $value) = each($products_ordered)) {
@@ -900,7 +902,7 @@ EOT;
         );
 
 
-        $process_parameters = array_merge($process_parameters,$varsvalues);
+        $process_parameters = array_merge($process_parameters, $varsvalues);
         // $dumpvar = "-- get process parameters\n";
         // $dumpvar .= print_r($process_parameters,true)."\n";
 
@@ -934,7 +936,7 @@ EOT;
             // $dumpvar .= print_r($storder,true)."\n";
             // exit("<pre>".$dumpvar."</pre>");
 
-            if (substr($storder['url'],0,5) <> 'https') {
+            if (substr($storder['url'], 0, 5) <> 'https') {
                 $messageStack->add_session(MODULE_PAYMENT_QUICKPAY_ADVANCED_ERROR_COMMUNICATION_FAILURE, 'error');
                 tep_redirect(tep_href_link(FILENAME_CHECKOUT_PAYMENT, 'payment_error=' . $this->code, 'SSL'));
             }
