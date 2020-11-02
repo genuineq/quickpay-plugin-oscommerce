@@ -775,7 +775,7 @@ EOT;
             'invoice_address[house_extension]' => '',
             'invoice_address[city]' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
             'invoice_address[zip_code]' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
-            'invoice_address[region]' => (isset($order->billing['state'])) ? ($order->billing['state']):9,
+            'invoice_address[region]' => (isset($order->billing['state'])) ? ($order->billing['state']): (''),
             'invoice_address[country_code]' => (isset($order->billing['country']['iso_code_3'])) ? ($order->billing['country']['iso_code_3']) : (''),
             'invoice_address[vat_no]' => '',
             'invoice_address[phone_number]' => '',
