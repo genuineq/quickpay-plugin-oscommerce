@@ -52,6 +52,7 @@ define('MODULE_AVAILABLE_CREDITCARDS',array(
 ));
 
 include(DIR_FS_CATALOG.DIR_WS_CLASSES.'QuickpayApi.php');
+include(DIR_FS_CATALOG.DIR_WS_CLASSES.'QuickpayISO3166.php');
 
 class quickpay_advanced {
 
@@ -690,12 +691,10 @@ EOT;
         }
 
         $process_button_string = '';
-        $process_fields ='';
-        $process_parameters = array();
+        $process_parameters = null;
 
         $qp_merchant_id = MODULE_PAYMENT_QUICKPAY_ADVANCED_MERCHANTID;
         $qp_agreement_id = MODULE_PAYMENT_QUICKPAY_ADVANCED_AGGREEMENTID;
-
 
         // TODO: dynamic language switching instead of hardcoded mapping
         $qp_language = "da";
@@ -734,69 +733,97 @@ EOT;
         // $qp_reference_title = $qp_order_id;
         // $qp_vat_amount = ($order->info['tax'] ? $order->info['tax'] : "0.00");
 
+
         //custom vars
-        $varsvalues = array(
-            'variables[customers_id]' => $customer_id,
-            'variables[customers_name]' => ((isset($order->customer['firstname'])) ? ($order->customer['firstname']) : ('')) . ((isset($order->customer['lastname'])) ? (' ' . $order->customer['lastname']) : ('')),
-            'variables[customers_company]' => (isset($order->customer['company'])) ? ($order->customer['company']) : (''),
-            'variables[customers_street_address]' => (isset($order->customer['street_address'])) ? ($order->customer['street_address']) : (''),
-            'variables[customers_suburb]' => (isset($order->customer['suburb'])) ? ($order->customer['suburb']) : (''),
-            'variables[customers_city]' => (isset($order->customer['city'])) ? ($order->customer['city']) : (''),
-            'variables[customers_postcode]' => (isset($order->customer['postcode'])) ? ($order->customer['postcode']) : (''),
-            'variables[customers_state]' => (isset($order->customer['state'])) ? ($order->customer['state']) : (''),
-            'variables[customers_country]' => (isset($order->customer['country']['title'])) ? ($order->customer['country']['title']) : (''),
-            'variables[customers_telephone]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
-            'variables[customers_email_address]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
+        $process_parameters = [
+            'agreement_id' => $qp_agreement_id,
+            'amount' => $qp_order_amount,
+            'autocapture' => $qp_autocapture,
+            'autofee' => $qp_autofee,
+            'callbackurl' => $qp_callbackurl,
+            'cancelurl' => $qp_cancelurl,
+            'continueurl' => $qp_continueurl,
+            'currency' => $qp_currency_code,
+            'description' => $qp_description,
+            'language' => $qp_language,
+            'merchant_id' => $qp_merchant_id,
+            'order_id' => $qp_order_id,
+            'payment_methods' => $qp_cardtypelock,
+            'subscription' => $qp_subscription,
+            'version' => 'v10',
 
-            'variables[delivery_name]' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->delivery['lastname'])) ? (' ' . $order->delivery['lastname']) : ('')),
-            'variables[delivery_company]' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
-            'variables[delivery_street_address]' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
-            'variables[delivery_suburb]' => (isset($order->delivery['suburb'])) ? ($order->delivery['suburb']) : (''),
-            'variables[delivery_city]' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
-            'variables[delivery_postcode]' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
-            'variables[delivery_state]' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
-            'variables[delivery_country]' => (isset($order->delivery['country']['title'])) ? ($order->delivery['country']['title']) : (''),
-            'variables[delivery_address_format_id]' => (isset($order->delivery['format_id'])) ? ($order->delivery['format_id']) : (''),
+            'variables' => [
+                'customers_id' => $customer_id,
+                'customers_name' => ((isset($order->customer['firstname'])) ? ($order->customer['firstname']) : ('')) . ((isset($order->customer['lastname'])) ? (' ' . $order->customer['lastname']) : ('')),
+                'customers_company' => (isset($order->customer['company'])) ? ($order->customer['company']) : (''),
+                'customers_street_address' => (isset($order->customer['street_address'])) ? ($order->customer['street_address']) : (''),
+                'customers_suburb' => (isset($order->customer['suburb'])) ? ($order->customer['suburb']) : (''),
+                'customers_city' => (isset($order->customer['city'])) ? ($order->customer['city']) : (''),
+                'customers_postcode' => (isset($order->customer['postcode'])) ? ($order->customer['postcode']) : (''),
+                'customers_state' => (isset($order->customer['state'])) ? ($order->customer['state']) : (''),
+                'customers_country' => (isset($order->customer['country']['title'])) ? ($order->customer['country']['title']) : (''),
+                'customers_telephone' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+                'customers_email_address' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
+                'delivery_name' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->delivery['lastname'])) ? (' ' . $order->delivery['lastname']) : ('')),
+                'delivery_company' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
+                'delivery_street_address' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
+                'delivery_suburb' => (isset($order->delivery['suburb'])) ? ($order->delivery['suburb']) : (''),
+                'delivery_city' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
+                'delivery_postcode' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
+                'delivery_state' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
+                'delivery_country' => (isset($order->delivery['country']['title'])) ? ($order->delivery['country']['title']) : (''),
+                'delivery_address_format_id' => (isset($order->delivery['format_id'])) ? ($order->delivery['format_id']) : (''),
+                'billing_name' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
+                'billing_company' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
+                'billing_street_address' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
+                'billing_suburb' => (isset($order->billing['suburb'])) ? ($order->billing['suburb']) : (''),
+                'billing_city' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
+                'billing_postcode' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
+                'billing_state' => (isset($order->billing['state'])) ? ($order->billing['state']) : (''),
+                'billing_country' => (isset($order->billing['country']['title'])) ? ($order->billing['country']['title']) : ('')
+            ],
 
-            'variables[billing_name]' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
-            'variables[billing_company]' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
-            'variables[billing_street_address]' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
-            'variables[billing_suburb]' => (isset($order->billing['suburb'])) ? ($order->billing['suburb']) : (''),
-            'variables[billing_city]' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
-            'variables[billing_postcode]' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
-            'variables[billing_state]' => (isset($order->billing['state'])) ? ($order->billing['state']) : (''),
-            'variables[billing_country]' => (isset($order->billing['country']['title'])) ? ($order->billing['country']['title']) : (''),
+            'invoice_address' => [
+                'name' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
+                'att' => '',
+                'company_name' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
+                'street' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
+                'house_number' => '',
+                'house_extension' => '',
+                'city' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
+                'zip_code' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
+                'region' => (isset($order->billing['state'])) ? ($order->billing['state']): (''),
+                'country_code' => QuickpayISO3166::alpha3($order->billing['country']['title']),
+                'vat_no' => '',
+                'phone_number' => '',
+                'mobile_number' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+                'email' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
+            ],
 
-            'invoice_address[name]' => ((isset($order->billing['firstname'])) ? ($order->billing['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
-            'invoice_address[att]' => '',
-            'invoice_address[company_name]' => (isset($order->billing['company'])) ? ($order->billing['company']) : (''),
-            'invoice_address[street]' => (isset($order->billing['street_address'])) ? ($order->billing['street_address']) : (''),
-            'invoice_address[house_number]' => '',
-            'invoice_address[house_extension]' => '',
-            'invoice_address[city]' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
-            'invoice_address[zip_code]' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
-            'invoice_address[region]' => (isset($order->billing['state'])) ? ($order->billing['state']): (''),
-            'invoice_address[country_code]' => (isset($order->billing['country']['iso_code_3'])) ? ($order->billing['country']['iso_code_3']) : (''),
-            'invoice_address[vat_no]' => '',
-            'invoice_address[phone_number]' => '',
-            'invoice_address[mobile_number]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
-            'invoice_address[email]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
+            'shipping_address' => [
+                'name' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
+                'att' => '',
+                'company_name' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
+                'street' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
+                'house_number' => '',
+                'house_extension' => '',
+                'city' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
+                'zip_code' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
+                'region' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
+                'country_code' => QuickpayISO3166::alpha3($order->delivery['country']['title']),
+                'vat_no' => '',
+                'phone_number' => '',
+                'mobile_number' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
+                'email' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : ('')
+            ],
 
-            'shipping_address[name]' => ((isset($order->delivery['firstname'])) ? ($order->delivery['firstname']) : ('')) . ((isset($order->billing['lastname'])) ? (' ' . $order->billing['lastname']) : ('')),
-            'shipping_address[att]' => '',
-            'shipping_address[company_name]' => (isset($order->delivery['company'])) ? ($order->delivery['company']) : (''),
-            'shipping_address[street]' => (isset($order->delivery['street_address'])) ? ($order->delivery['street_address']) : (''),
-            'shipping_address[house_number]' => '',
-            'shipping_address[house_extension]' => '',
-            'shipping_address[city]' => (isset($order->delivery['city'])) ? ($order->delivery['city']) : (''),
-            'shipping_address[zip_code]' => (isset($order->delivery['postcode'])) ? ($order->delivery['postcode']) : (''),
-            'shipping_address[region]' => (isset($order->delivery['state'])) ? ($order->delivery['state']) : (''),
-            'shipping_address[country_code]' => (isset($order->delivery['country']['iso_code_3'])) ? ($order->delivery['country']['iso_code_3']) : (''),
-            'shipping_address[vat_no]' => '',
-            'shipping_address[phone_number]' => '',
-            'shipping_address[mobile_number]' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
-            'shipping_address[email]' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
-        );
+            'basket' => [],
+
+            'shopsystem' => [
+                'name' => "OsCommerce",
+                'version' => "1.0.4"
+            ]
+        ];
 
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
             $order_products_id = tep_get_prid($order->products[$i]['id']);
@@ -838,6 +865,14 @@ EOT;
             $total_cost += $total_products_price;
 
             $products_ordered[] = $order->products[$i]['qty'] . ' x ' . $order->products[$i]['name'] . ' (' . $order->products[$i]['model'] . ') = ' . $currencies->display_price($order->products[$i]['final_price'], $order->products[$i]['tax'], $order->products[$i]['qty']) . $products_ordered_attributes . "-";
+
+            $process_parameters['basket'][$i] = [
+                'qty' =>  $order->products[$i]['qty'],
+                'item_no' =>  $order->products[$i]['id'],
+                'item_name' =>  $order->products[$i]['name'],
+                'item_price' =>  $order->products[$i]['final_price'],
+                'vat_rate' =>  '',
+            ];
         }
 
         $ps="";
@@ -845,65 +880,34 @@ EOT;
             $ps .= $value;
         }
 
-        $varsvalues["variables[products]"] = html_entity_decode($ps);
-        $varsvalues["variables[shopsystem]"] = "OsCommerce";
-
-        $varsvalues["shopsystem[name]"] = "OsCommerce";
-        $varsvalues["shopsystem[version]"] = "1.0.4";
-        //end custom vars
-
-        // register fields to hand over
-        $process_parameters = array(
-            'agreement_id'                 => $qp_agreement_id,
-            'amount'                       => $qp_order_amount,
-            'autocapture'                  => $qp_autocapture,
-            'autofee'                      => $qp_autofee,
-            // 'branding_id'                  => $qp_branding_id,
-            'callbackurl'                  => $qp_callbackurl,
-            'cancelurl'                    => $qp_cancelurl,
-            'continueurl'                  => $qp_continueurl,
-            'currency'                     => $qp_currency_code,
-            'description'                  => $qp_description,
-            // 'google_analytics_client_id'   => $qp_google_analytics_client_id,
-            // 'google_analytics_tracking_id' => $analytics_tracking_id,
-            'language'                     => $qp_language,
-            'merchant_id'                  => $qp_merchant_id,
-            'order_id'                     => $qp_order_id,
-            'payment_methods'              => $qp_cardtypelock,
-            // 'product_id'                   => $qp_product_id,
-            // 'category'                     => $qp_category,
-            // 'reference_title'              => $qp_reference_title,
-            // 'vat_amount'                   => $qp_vat_amount,
-            'subscription'                 => $qp_subscription,
-            'version'                      => 'v10'
-        );
-
-
-        $process_parameters = array_merge($process_parameters, $varsvalues);
+        $process_parameters['variables']['products'] = html_entity_decode($ps);
+        $process_parameters['variables']['shopsystem'] = "OsCommerce";
 
         // $dumpvar = "-- get process parameters\n";
         // $dumpvar .= print_r($process_parameters,true)."\n";
 
         if($_POST['callquickpay'] == "go") {
-            $apiorder= new QuickpayApi();
+            $apiorder = new QuickpayApi();
             $apiorder->setOptions(MODULE_PAYMENT_QUICKPAY_ADVANCED_USERAPIKEY);
+
             //set status request mode
-            $mode = (MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION == "Normal" ? "" : "1");
+            $mode = (("Normal" == MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION) ? ("") : ("1"));
+
             //been here before?
             $exists = $this->get_quickpay_order_status($order_id, $mode);
 
             // $dumpvar .= "-- get order status\n";
             // $dumpvar .= print_r($exists,true)."\n";
             $qid = $exists["qid"];
-            //set to create/update mode
-            $apiorder->mode = (MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION == "Normal" ? "payments/" : "subscriptions/");
 
-            if($exists["qid"] == null){
+            //set to create/update mode
+            $apiorder->mode = (("Normal" == MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION) ? ("payments/") : ("subscriptions/"));
+
+            if (null == $exists["qid"]) {
                 //create new quickpay order
                 $storder = $apiorder->createorder($qp_order_id, $qp_currency_code, $process_parameters);
                 $qid = $storder["id"];
-
-            }else{
+            } else {
                 $qid = $exists["qid"];
             }
 
@@ -921,11 +925,11 @@ EOT;
 
             $process_button_string .= "
                 <script>
-                    //alert('qp ".$qp_order_id."-".$order_id."');
-                    window.location.replace('".$storder['url']."');
+                    //alert('qp " . $qp_order_id . "-" . $order_id . "');
+                    window.location.replace('" . $storder['url'] . "');
                 </script>";
         }
-        $process_button_string .=  "<input type='hidden' value='go' name='callquickpay' />". "\n".
+        $process_button_string .=  "<input type='hidden' value='go' name='callquickpay' />" . "\n".
                                    "<input type='hidden' value='" . $_POST['cardlock'] . "' name='cardlock' />";
 
         return $process_button_string;
@@ -1462,21 +1466,21 @@ EOT;
     }
 
 
-    private function get_quickpay_order_status($order_id,$mode="") {
-        $api= new QuickpayApi();
-
+    private function get_quickpay_order_status($order_id, $mode="") {
+        $api = new QuickpayApi();
         $api->setOptions(MODULE_PAYMENT_QUICKPAY_ADVANCED_USERAPIKEY);
 
         try {
-            $api->mode = ($mode=="" ? "payments?order_id=" : "subscriptions?order_id=");
+            $api->mode = ($mode == "" ? "payments?order_id=" : "subscriptions?order_id=");
 
             // Commit the status request, checking valid transaction id
-            $st = $api->status(MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDERPREFIX.sprintf('%04d', $order_id));
+            $st = $api->status(MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDERPREFIX . sprintf('%04d', $order_id));
+
             $eval = array();
-            if($st[0]["id"]){
-                $eval["oid"] = str_replace(MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDERPREFIX,"", $st[0]["order_id"]);
+            if ($st[0]["id"]) {
+                $eval["oid"] = str_replace(MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDERPREFIX, "", $st[0]["order_id"]);
                 $eval["qid"] = $st[0]["id"];
-            }else{
+            } else {
                 $eval["oid"] = null;
                 $eval["qid"] = null;
             }
