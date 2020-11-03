@@ -58,7 +58,6 @@ class quickpay_advanced {
 
     var $code, $title, $description, $enabled, $creditcardgroup, $num_groups;
 
-// class constructor
     function __construct() {
         global $order,$cardlock;
 
@@ -95,16 +94,15 @@ class quickpay_advanced {
             }
         }
 
-//V10
-        if($_POST['quickpayIT'] == "go" && !isset($_SESSION['qlink'])) {
+        /** V10 */
+        if (("go" == $_POST['quickpayIT']) && !isset($_SESSION['qlink'])) {
             $this->form_action_url = 'https://payment.quickpay.net/';
-        }else{
+        } else {
             $this->form_action_url = tep_href_link(FILENAME_CHECKOUT_CONFIRMATION, '', 'SSL');
         }
     }
 
-
-// class methods
+    /** Class methods */
     function update_status() {
         global $order, $quickpay_fee, $HTTP_POST_VARS, $qp_card;
 
@@ -128,20 +126,20 @@ class quickpay_advanced {
 
         if (!tep_session_is_registered('qp_card'))
             tep_session_register('qp_card');
+
         if (isset($_POST['qp_card']))
             $qp_card = $_POST['qp_card'];
 
         if (!tep_session_is_registered('cart_QuickPay_ID'))
             tep_session_register('cart_QuickPay_ID');
+
         if (isset($_GET['cart_QuickPay_ID']))
             $qp_card = $_GET['cart_QuickPay_ID'];
-
 
         if (!tep_session_is_registered('quickpay_fee')) {
             tep_session_register('quickpay_fee');
         }
     }
-
 
     function javascript_validation() {
         $js = '  if (payment_value == "' . $this->code . '") {' . "\n" .
@@ -170,8 +168,8 @@ class quickpay_advanced {
         return $js;
     }
 
-
-    function selection() {
+    /* Define payment method selector on checkout page */
+    public function selection() {
         global $order, $currencies, $qp_card, $cardlock;
         $qty_groups = 0;
 
@@ -214,7 +212,7 @@ class quickpay_advanced {
                                 $iconc = DIR_WS_ICONS.$optionc.".gif";
                             }
 
-                            //define payment icon width
+                            /** Define payment icons width */
                             $w = 35;
                             $h = 22;
                             $space = 5;
@@ -258,7 +256,7 @@ class quickpay_advanced {
                                     ' onClick="setQuickPay(); document.checkout_payment.cardlock.value = \''.$option.'\';" '
                                 )
                             );
-                        }//end qty=1
+                        }/** end qty=1 */
                     }
 
                     if($option != "creditcard"){
@@ -678,7 +676,7 @@ EOT;
         // }else{return false;}
     }
 
-
+    /* Define payment button and data array to be sent */
     function process_button() {
         global $_POST, $customer_id, $order, $currencies, $currency, $languages_id, $language, $cart_QuickPay_ID, $order_total_modules, $messageStack;
         /** collect all post fields and attach as hiddenfieds to button */
@@ -696,7 +694,7 @@ EOT;
         $qp_merchant_id = MODULE_PAYMENT_QUICKPAY_ADVANCED_MERCHANTID;
         $qp_agreement_id = MODULE_PAYMENT_QUICKPAY_ADVANCED_AGGREEMENTID;
 
-        // TODO: dynamic language switching instead of hardcoded mapping
+        /** TODO: dynamic language switching instead of hardcoded mapping */
         $qp_language = "da";
         switch ($language) {
             case "english": $qp_language = "en";
@@ -718,7 +716,7 @@ EOT;
         $qp_description = "Merchant ".$qp_merchant_id." ".(MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION == "Normal" ? "Authorize" : "Subscription");
         $order_id = substr($cart_QuickPay_ID, strpos($cart_QuickPay_ID, '-') + 1);
         $qp_order_id = MODULE_PAYMENT_QUICKPAY_ADVANCED_ORDERPREFIX.sprintf('%04d', $order_id);
-        // Calculate the total order amount for the order (the same way as in checkout_process.php)
+        /** Calculate the total order amount for the order (the same way as in checkout_process.php) */
         $qp_order_amount = 100 * $currencies->calculate($order->info['total'], true, $order->info['currency'], $order->info['currency_value'], '.', '');
         $qp_currency_code = $order->info['currency'];
         $qp_continueurl = tep_href_link(FILENAME_CHECKOUT_PROCESS, 'cart_QuickPay_ID='.$cart_QuickPay_ID, 'SSL');
@@ -780,7 +778,8 @@ EOT;
                 'billing_city' => (isset($order->billing['city'])) ? ($order->billing['city']) : (''),
                 'billing_postcode' => (isset($order->billing['postcode'])) ? ($order->billing['postcode']) : (''),
                 'billing_state' => (isset($order->billing['state'])) ? ($order->billing['state']) : (''),
-                'billing_country' => (isset($order->billing['country']['title'])) ? ($order->billing['country']['title']) : ('')
+                'billing_country' => (isset($order->billing['country']['title'])) ? ($order->billing['country']['title']) : (''),
+                'shopsystem' => 'OsCommerce',
             ],
 
             'invoice_address' => [
@@ -828,7 +827,7 @@ EOT;
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
             $order_products_id = tep_get_prid($order->products[$i]['id']);
 
-            //------insert customer choosen option to order--------
+            /** Insert customer choosen option to order */
             $attributes_exist = '0';
             $products_ordered_attributes = '';
             if (isset($order->products[$i]['attributes'])) {
@@ -881,42 +880,29 @@ EOT;
         }
 
         $process_parameters['variables']['products'] = html_entity_decode($ps);
-        $process_parameters['variables']['shopsystem'] = "OsCommerce";
 
-        // $dumpvar = "-- get process parameters\n";
-        // $dumpvar .= print_r($process_parameters,true)."\n";
-
-        if($_POST['callquickpay'] == "go") {
+        if("go" == $_POST['callquickpay']) {
             $apiorder = new QuickpayApi();
             $apiorder->setOptions(MODULE_PAYMENT_QUICKPAY_ADVANCED_USERAPIKEY);
 
-            //set status request mode
+            /** Set status request mode */
             $mode = (("Normal" == MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION) ? ("") : ("1"));
 
-            //been here before?
-            $exists = $this->get_quickpay_order_status($order_id, $mode);
-
-            // $dumpvar .= "-- get order status\n";
-            // $dumpvar .= print_r($exists,true)."\n";
-            $qid = $exists["qid"];
-
-            //set to create/update mode
+            /** Set to create/update mode */
             $apiorder->mode = (("Normal" == MODULE_PAYMENT_QUICKPAY_ADVANCED_SUBSCRIPTION) ? ("payments/") : ("subscriptions/"));
 
+            /** Check if order exists. */
+            $qid = null;
+            $exists = $this->get_quickpay_order_status($order_id, $mode);
             if (null == $exists["qid"]) {
-                //create new quickpay order
+                /** Create new quickpay order */
                 $storder = $apiorder->createorder($qp_order_id, $qp_currency_code, $process_parameters);
                 $qid = $storder["id"];
             } else {
                 $qid = $exists["qid"];
             }
 
-            // $dumpvar .= "-- Create order\n";
-            // $dumpvar .= print_r($storder,true)."\n";
             $storder = $apiorder->link($qid, $process_parameters);
-            // $dumpvar .= "-- Get link\n";
-            // $dumpvar .= print_r($storder,true)."\n";
-            // exit("<pre>".$dumpvar."</pre>");
 
             if (substr($storder['url'], 0, 5) <> 'https') {
                 $messageStack->add_session(MODULE_PAYMENT_QUICKPAY_ADVANCED_ERROR_COMMUNICATION_FAILURE, 'error');
@@ -929,16 +915,17 @@ EOT;
                     window.location.replace('" . $storder['url'] . "');
                 </script>";
         }
+
         $process_button_string .=  "<input type='hidden' value='go' name='callquickpay' />" . "\n".
                                    "<input type='hidden' value='" . $_POST['cardlock'] . "' name='cardlock' />";
 
         return $process_button_string;
     }
 
-
+    /* Before order is processed */
     function before_process() {
-        // called in FILENAME_CHECKOUT_PROCESS
-        // check if order is approved by callback
+        /** Called in FILENAME_CHECKOUT_PROCESS */
+        /** check if order is approved by callback */
         global $customer_id, $order, $order_id, $order_totals, $order_total_modules, $sendto, $billto, $languages_id, $payment, $currencies, $cart, $cart_QuickPay_ID;
 
         $order_id = substr($cart_QuickPay_ID, strpos($cart_QuickPay_ID, '-') + 1);
@@ -959,12 +946,13 @@ EOT;
             $order = new quickpay_order($order);
         }
 
-        //for debugging with FireBug / FirePHP
+        /** For debugging with FireBug / FirePHP */
         global $firephp;
         if (isset($firephp)) {
             $firephp->log($order_id, 'order_id');
         }
 
+        /** Update order status */
         tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (int)$order_status_approved_id . "', last_modified = now() where orders_id = '" . (int)$order_id . "'");
 
         $sql_data_array = array(
@@ -1097,7 +1085,7 @@ EOT;
         $this->after_process();
     }
 
-
+    /* After order is processed */
     function after_process() {
         global $cart;
 

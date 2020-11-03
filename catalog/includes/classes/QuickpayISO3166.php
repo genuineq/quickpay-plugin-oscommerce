@@ -24,7 +24,7 @@ class QuickpayISO3166
     /**
      * Get a country code alpha 2 code.
      */
-    public function alpha2($country)
+    public static function alpha2($country)
     {
         $country = self::countryByName($country);
 
@@ -34,7 +34,7 @@ class QuickpayISO3166
     /**
      * Get a country code alpha 3 code.
      */
-    public function alpha3($country)
+    public static function alpha3($country)
     {
         $country = self::countryByName($country);
 
@@ -44,7 +44,7 @@ class QuickpayISO3166
     /**
      * Get the numeric code of a country.
      */
-    public function numeric($country)
+    public static function numeric($country)
     {
         $country = self::countryByName($country);
 
@@ -54,7 +54,7 @@ class QuickpayISO3166
     /**
      * Extract all countries.
      */
-    public function all()
+    public static function all()
     {
         return self::$countries;
     }
@@ -64,7 +64,7 @@ class QuickpayISO3166
      *
      * @return int
      */
-    public function count()
+    public static function count()
     {
         return count(self::$countries);
     }
