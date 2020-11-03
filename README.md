@@ -23,7 +23,6 @@ Changelog
 - Changed the custom variables of the payment fields to be in accordance to the quickpay docs
 1.0.3
 - Added possibility to configure the text displayed for the payment options.
-- Removed version from folder name.
 1.0.2
 - Indented all code to ease future development.
 - Fixed not defined variable warnings:

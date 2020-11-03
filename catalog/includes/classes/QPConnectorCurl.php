@@ -47,6 +47,7 @@ class QPConnectorCurl implements QPConnectorInterface {
             'Accept: ' . $this->format
         ));
 
+
         if (!is_null($postdata)) {
             if($sendmode=='GET-POST'){
                 curl_setopt($curl, CURLOPT_POST, 1);
