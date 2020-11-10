@@ -797,7 +797,7 @@ EOT;
                 'qty' =>  $order->products[$i]['qty'],
                 'item_no' =>  $order->products[$i]['id'],
                 'item_name' =>  $order->products[$i]['name'],
-                'item_price' =>  $order->products[$i]['final_price'],
+                'item_price' =>  ($order->products[$i]['final_price'] * $order->products[$i]['qty']),
                 'vat_rate' =>  ''
             ];
         }
