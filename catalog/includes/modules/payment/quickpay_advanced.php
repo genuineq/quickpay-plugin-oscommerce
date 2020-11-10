@@ -764,7 +764,7 @@ EOT;
                 'vat_no' => '',
                 'phone_number' => '',
                 'mobile_number' => (isset($order->customer['telephone'])) ? ($order->customer['telephone']) : (''),
-                'email' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : (''),
+                'email' => (isset($order->customer['email_address'])) ? ($order->customer['email_address']) : ('')
             ],
 
             'shipping_address' => [
@@ -793,12 +793,12 @@ EOT;
         ];
 
         for ($i = 0, $n = sizeof($order->products); $i < $n; $i++) {
-            $process_parameters['basket'][$i] = [
+            $process_parameters['basket'][] = [
                 'qty' =>  $order->products[$i]['qty'],
                 'item_no' =>  $order->products[$i]['id'],
                 'item_name' =>  $order->products[$i]['name'],
                 'item_price' =>  $order->products[$i]['final_price'],
-                'vat_rate' =>  '',
+                'vat_rate' =>  ''
             ];
         }
 
